@@ -25,17 +25,17 @@ public class UserController {
         return userService.findById(idUser);
     }
 
-    @GetMapping("")
+    @PostMapping("")
     public ResponseEntity<?> save(@RequestBody User user){
         return userService.save(user);
     }
 
-    @GetMapping("")
+    @PutMapping("")
     public ResponseEntity<?> update(@RequestBody User user){
         return userService.update(user);
     }
 
-    @GetMapping("")
+    @DeleteMapping("")
     public ResponseEntity<?> deleteById(@RequestBody User user){
         return userService.deleteById(user);
     }
