@@ -1,0 +1,5 @@
+Nombre: Ejercicio ED
+Descripción: Hacer ejecicio con LinkedList
+Fecha: 15/10/2024
+Estado: Pendiente
+
