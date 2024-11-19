@@ -1,107 +1,9 @@
 package juego;
 
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
-    private static class Batalla {
-        private Jugador jugador1;
-        private Jugador jugador2;
-        private Queue<Pokemon> colaJugador1;
-        private Queue<Pokemon> colaJugador2;
-        private Scanner scanner;
-        private boolean turnoAlternante;
-
-        public Batalla(Jugador jugador1, Jugador jugador2) {
-            this.jugador1 = jugador1;
-            this.jugador2 = jugador2;
-            this.colaJugador1 = ordenarPorVelocidad(jugador1.getEquipo());
-            this.colaJugador2 = ordenarPorVelocidad(jugador2.getEquipo());
-            this.scanner = new Scanner(System.in);
-            this.turnoAlternante = true;
-        }
-
-        private Queue<Pokemon> ordenarPorVelocidad(Pokemon[] equipo) {
-            Queue<Pokemon> cola = new LinkedList<>();
-            for (int i = 0; i < equipo.length; i++) {
-                int maxIndex = i;
-                for (int j = i + 1; j < equipo.length; j++) {
-                    if (equipo[j].getVelocidad() > equipo[maxIndex].getVelocidad()) {
-                        maxIndex = j;
-                    }
-                }
-                Pokemon temp = equipo[i];
-                equipo[i] = equipo[maxIndex];
-                equipo[maxIndex] = temp;
-                cola.offer(equipo[i]);
-            }
-            return cola;
-        }
-
-        public void iniciarBatalla() {
-            System.out.println("¡Comienza la batalla entre " + jugador1.getNombre() + " y " + jugador2.getNombre() + "!");
-
-            boolean turnoJugador1 = true; // Indica de quién es el turno
-
-            while (!colaJugador1.isEmpty() && !colaJugador2.isEmpty()) {
-                Pokemon pokemon1 = colaJugador1.peek();
-                Pokemon pokemon2 = colaJugador2.peek();
-
-                if (turnoJugador1) {
-                    ejecutarTurno(jugador1, pokemon1, pokemon2, colaJugador1, colaJugador2);
-                } else {
-                    ejecutarTurno(jugador2, pokemon2, pokemon1, colaJugador2, colaJugador1);
-                }
-
-                if (colaJugador1.isEmpty()) {
-                    System.out.println(jugador2.getNombre() + " ha ganado la batalla!");
-                    break;
-                } else if (colaJugador2.isEmpty()) {
-                    System.out.println(jugador1.getNombre() + " ha ganado la batalla!");
-                    break;
-                }
-
-                turnoJugador1 = !turnoJugador1;
-            }
-        }
-
-
-        private void ejecutarTurno(Jugador jugador, Pokemon atacante, Pokemon defensor, Queue<Pokemon> colaAtacante, Queue<Pokemon> colaDefensor) {
-            Movimiento movimiento = seleccionarMovimiento(jugador, atacante);
-            System.out.println(jugador.getNombre() + " elige el movimiento " + movimiento + " para " + atacante.getNombre());
-
-            boolean defensorDerrotado = atacante.atacar(movimiento, defensor);
-
-            if (defensorDerrotado) {
-                System.out.println(defensor.getNombre() + " ha sido derrotado.");
-                colaDefensor.poll();
-            }
-        }
-
-
-        private Movimiento seleccionarMovimiento(Jugador jugador, Pokemon atacante) {
-            System.out.println("Turno de " + jugador.getNombre() + " con " + atacante.getNombre());
-            System.out.println("Movimientos disponibles:");
-
-            Movimiento[] movimientos = atacante.getMovimientos();
-            for (int i = 0; i < movimientos.length; i++) {
-                System.out.println(i + 1 + ". " + movimientos[i] + " (Potencia: " + movimientos[i].getPotencia() + ", Precisión: " + movimientos[i].getPrecision() + ")");
-            }
-
-            System.out.print("Seleccione un movimiento (1-" + movimientos.length + "): ");
-            int opcion = scanner.nextInt();
-
-            while (opcion < 1 || opcion > movimientos.length) {
-                System.out.print("Opción inválida. Intente nuevamente: ");
-                opcion = scanner.nextInt();
-            }
-
-            return movimientos[opcion - 1];
-        }
-    }
-
 
     public static void main(String[] args) {
         System.out.println("Bienvenido al juego");
@@ -122,8 +24,55 @@ public class Main {
         //Se compone de 2 jugadores
         //De una cola de turnos <-- dependiendo de la velocidad
 
-        Batalla batalla = new Batalla(ignacio,karol);
-        batalla.iniciarBatalla();
+        Queue<Jugador> colaTurnos = new LinkedList<>();
+        colaTurnos.add(karol);
+        colaTurnos.add(ignacio);
 
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Bienvenido al juego");
+
+        while (!karol.sinPokemones() && !ignacio.sinPokemones()) {
+            Jugador jugadorActual = colaTurnos.poll();
+            Pokemon pokemonActual = jugadorActual.getPokemonActivo();
+            Jugador oponente = (jugadorActual == karol) ? ignacio : karol;
+
+            System.out.println("Turno de " + jugadorActual.getNombre() + " con " + pokemonActual.getNombre());
+            System.out.println("Movimientos disponibles:");
+            Movimiento[] movimientos = pokemonActual.getMovimientos();
+            for (int i = 0; i < movimientos.length; i++) {
+                Movimiento movimiento = movimientos[i];
+                System.out.println((i + 1) + ". " + movimiento.name() +
+                        " (Potencia: " + movimiento.getPotencia() +
+                        ", Precisión: " + movimiento.getPrecision() + ")");
+            }
+
+
+            System.out.print("Selecciona un movimiento (1-" + movimientos.length + "): ");
+            int opcion = scanner.nextInt() - 1;
+
+            if (opcion < 0 || opcion >= movimientos.length) {
+                System.out.println("Movimiento inválido. Se pierde el turno.");
+            } else {
+                Movimiento movimientoSeleccionado = movimientos[opcion];
+                Pokemon objetivo = oponente.getPokemonActivo();
+
+                if (pokemonActual.atacar(movimientoSeleccionado, objetivo)) {
+                    if (objetivo.getVida() <= 0) {
+                        oponente.siguientePokemon();
+                        if (oponente.sinPokemones()) {
+                            System.out.println(oponente.getNombre() + " se quedó sin Pokémon. ¡" + jugadorActual.getNombre() + " gana!");
+                            return;
+                        }
+                        System.out.println("Nuevo Pokémon de " + oponente.getNombre() + ": " +
+                                oponente.getPokemonActivo().getNombre());
+                    }
+                }
+            }
+
+            if (!jugadorActual.sinPokemones()) {
+                colaTurnos.add(jugadorActual);
+            }
+        }
     }
 }
