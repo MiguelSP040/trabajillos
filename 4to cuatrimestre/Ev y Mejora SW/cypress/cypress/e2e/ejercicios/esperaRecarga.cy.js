@@ -1,0 +1,12 @@
+it('Espera y recarga la página', () => {
+    cy.visit('https://example.cypress.io/commands/aliasing')
+    cy.get('.as-table').find('tbody>tr')
+    .first().find('td').first()
+    .find('button').as('firstBtn')
+    cy.get('@firstBtn').click()
+    cy.get('@firstBtn')
+    .should('have.text', 'Changed')
+    cy.reload()
+    cy.get('@firstBtn')
+    .should('have.text', 'Click to toggle')
+})
