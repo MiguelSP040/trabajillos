@@ -1,0 +1,21 @@
+
+taskName=Maurio
+description=Bros
+date=30-10-2024
+pending=Pendiente
+
+
+
+taskName=Derek
+description=Ayuda
+date=12-12-2024
+pending=Pendiente
+
+
+
+taskName=Gio
+description=Llevar lap
+date=32-02-2089
+pending=Pendiente
+
+

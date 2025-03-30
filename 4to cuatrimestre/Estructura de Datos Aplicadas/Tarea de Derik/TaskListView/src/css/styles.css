@@ -1,0 +1,36 @@
+.colored-toast .swal2-title,
+.colored-toast .swal2-html-container {
+    color: white;
+}
+.no-select-popup .swal2-title,
+.colored-toast .swal2-html-container {
+    user-select: none;
+    cursor: default;
+}
+.no-select {
+    user-select: none;
+}
+/* Estilo para el toast de éxito */
+.swal2-popup.no-select-popup.colored-toast.success {
+    background-color: #a5dc86 !important;
+}
+
+/* Estilo para el toast de error */
+.swal2-popup.no-select-popup.colored-toast.error {
+    background-color: #f27474 !important;
+}
+
+.table-colored th {
+    background-color: #3083A2 !important;
+    color: #ffffff; /* Cambia esto a un color diferente si es necesario */
+}
+
+body {
+    background-color: #F2F2F2;
+}
+
+.table-responsive {
+    height: 40rem;
+    max-height: 40rem;
+    overflow-y: auto;
+}
